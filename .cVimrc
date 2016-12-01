@@ -1,4 +1,3 @@
 set regexp
 set ignorecase
-map g :tabnew google<Space>
 map y :tabnew youtube<Space>
