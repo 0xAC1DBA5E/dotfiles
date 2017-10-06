@@ -1,3 +1,4 @@
 set regexp
 set ignorecase
+set noautofocus
 map y :tabnew youtube<Space>
