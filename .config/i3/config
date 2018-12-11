@@ -158,12 +158,16 @@ exec --no-startup-id nm-applet
 exec --no-startup-id udiskie -ans &
 
 # start compton
-exec compton -GCb
+exec compton --config ~/.config/compton.conf -b
 
 # audio control
-bindsym XF86AudioRaiseVolume exec amixer -q set Master 2dB+ unmute
-bindsym XF86AudioLowerVolume exec amixer -q set Master 2dB- unmute
-bindsym XF86AudioMute exec amixer -q set Master toggle
+#bindsym XF86AudioRaiseVolume exec amixer -q set Master 2dB+ unmute
+#bindsym XF86AudioLowerVolume exec amixer -q set Master 2dB- unmute
+#bindsym XF86AudioMute exec amixer -q set Master toggle
+# Pulse Audio controls
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5% #increase sound volume
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5% #decrease sound volume
+bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle # mute sound
 
 # i3lock
 bindsym $mod+Mod1+l exec i3lock -c 000000

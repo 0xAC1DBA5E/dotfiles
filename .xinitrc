@@ -1,3 +1,1 @@
-# ~/.xinitrc
-
 exec i3

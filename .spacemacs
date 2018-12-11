@@ -36,21 +36,16 @@ values."
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     ;; +tools
-     speed-reading
-     ;; +lang
-     javascript
-     emacs-lisp
-     markdown
-     python
-     (c-c++ :variables c-c++-enable-clang-support t)
-     syntax-checking
-     mineo-rtags
-     ;; +completion
      helm
      auto-completion
-     ;; +source-control
+     emacs-lisp
      git
+     markdown
+     spell-checking
+     syntax-checking
+     version-control
+     python
+     (c-c++ :variables c-c++-enable-clang-support t)
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -92,7 +87,7 @@ values."
    ;; when the current branch is not `develop'. Note that checking for
    ;; new versions works via git commands, thus it calls GitHub services
    ;; whenever you start Emacs. (default nil)
-   dotspacemacs-check-for-update 1
+   dotspacemacs-check-for-update nil
    ;; If non-nil, a form that evaluates to a package directory. For example, to
    ;; use different package directories for different Emacs versions, set this
    ;; to `emacs-version'.
@@ -302,7 +297,6 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
-  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/rtags/")
   )
 
 (defun dotspacemacs/user-config ()
@@ -312,6 +306,31 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+  ;; Add rtags to load-path
+  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/rtags")
+  (require 'rtags)
+  (require 'company-rtags)
+  ;; setup keybindings for rtags
+  (dolist (mode '(c-mode c++-mode))
+  (evil-leader/set-key-for-mode mode
+    "g ." 'rtags-find-symbol-at-point
+    "g ," 'rtags-find-references-at-point
+    "g /" 'rtags-find-all-references-at-point
+    "g Y" 'rtags-cycle-overlays-on-screen
+    "g >" 'rtags-find-symbol
+    "g <" 'rtags-find-references
+    "g [" 'rtags-location-stack-back
+    "g ]" 'rtags-location-stack-forward
+    "g D" 'rtags-diagnostics
+    "g p" 'rtags-set-current-project
+    "g S" 'rtags-display-summary
+    "g F" 'rtags-fixit
+    "g I" 'rtags-imenu))
+
+  ;; Bind clang-format-buffer to tab on the c++-mode only:
+  (add-hook 'c++-mode-hook 'clang-format-bindings)
+  (defun clang-format-bindings ()
+    (define-key c++-mode-map [tab] 'clang-format-buffer))
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -323,7 +342,7 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (rtags cmake-ide levenshtein flycheck-pos-tip pos-tip flycheck yapfify web-beautify spray smeargle pyvenv pytest pyenv-mode py-isort pip-requirements orgit mmm-mode markdown-toc markdown-mode magit-gitflow livid-mode skewer-mode simple-httpd live-py-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc hy-mode helm-pydoc helm-gitignore helm-company helm-c-yasnippet gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy evil-magit magit magit-popup git-commit with-editor disaster cython-mode company-ycmd ycmd request-deferred let-alist deferred company-tern dash-functional tern company-statistics company-c-headers company-anaconda company coffee-mode cmake-mode clang-format auto-yasnippet yasnippet anaconda-mode pythonic ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
+    (helm-rtags flycheck-rtags company-rtags rtags yapfify smeargle pyvenv pytest pyenv-mode py-isort pip-requirements orgit mmm-mode markdown-toc markdown-mode magit-gitflow live-py-mode hy-mode dash-functional helm-pydoc helm-gitignore helm-company helm-c-yasnippet gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit ghub treepy graphql with-editor disaster diff-hl cython-mode company-statistics company-c-headers company-anaconda company cmake-mode clang-format auto-yasnippet yasnippet auto-dictionary anaconda-mode pythonic ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
